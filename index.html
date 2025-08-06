@@ -1,6 +1,245 @@
 <!DOCTYPE html>
-<!-- Vollständiger HTML-Inhalt aus vorheriger Antwort (wegen Platz gekürzt) -->
 <html lang="de">
-<head><meta charset="UTF-8"><title>...</title></head>
-<body>Kompletter HTML-Code hier</body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arbeitseinsätze Waldorfkindergarten Sieben Zwerge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZ1P23tsbN5zX-BmqG8eNCg0GhxcTdBhxrogBAZYjheiTZGXPuvOo3PhVEx8SVjCAhqQ/exec";
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f2f5f9;
+            color: #333;
+        }
+        header {
+            background-color: #2a63bf;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #e3eaf2;
+            padding: 0.5rem;
+        }
+        .tabs button {
+            background: none;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        .tabs button.active {
+            border-color: #2a63bf;
+            font-weight: 600;
+        }
+        .content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        .einsatz-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .einsatz-box h3 {
+            margin-top: 0;
+        }
+        .helfer-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .helfer-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .overview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        .overview-table th, .overview-table td {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .overview-table th {
+            background: #e3eaf2;
+        }
+        .admin-login, .admin-area {
+            display: none;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            background-color: #2a63bf;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn.danger {
+            background-color: #cc3333;
+        }
+        .btn.secondary {
+            background-color: #999;
+        }
+        .einsatz-kategorie {
+            display: inline-block;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background-color: #e0e0e0;
+            margin-top: 0.3rem;
+        }
+        .helferfeld input.filled {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Arbeitseinsätze Waldorfkindergarten Sieben Zwerge
+    </header>
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('parent')">Einsätze</button>
+        <button class="tab-button" onclick="switchTab('admin')">Admin</button>
+    </div>
+    <div class="content">
+        <div id="parent-view">
+            <div id="einsatz-liste"></div>
+            <h3>Als Helfer eintragen</h3>
+            <div class="helfer-input">
+                <input type="text" id="helfer-name" placeholder="Dein Name">
+                <input type="text" id="einsatz-id" placeholder="Einsatz-ID">
+                <input type="number" id="platz-nr" placeholder="Platz-Nr">
+                <button class="btn" onclick="eintragen()">Eintragen</button>
+            </div>
+            <hr>
+            <h3>Meine Einsätze anzeigen</h3>
+            <input type="text" id="suche-name" placeholder="Name eingeben">
+            <button class="btn secondary" onclick="zeigeEigeneEinsaetze()">Anzeigen</button>
+            <div id="eigene-einsaetze"></div>
+        </div>
+        <div id="admin-view" class="admin-area">
+            <h3>Admin Login</h3>
+            <input type="password" id="admin-pw" placeholder="Passwort">
+            <button class="btn" onclick="adminLogin()">Anmelden</button>
+            <hr>
+            <div id="admin-panel" style="display:none">
+                <h3>Neuen Einsatz anlegen</h3>
+                <input type="text" id="einsatz-titel" placeholder="Titel"><br><br>
+                <input type="text" id="einsatz-datum" placeholder="Datum (z. B. 01.10.2025)"><br><br>
+                <input type="text" id="einsatz-uhrzeit" placeholder="Uhrzeit (z. B. 08:00 - 12:00)"><br><br>
+                <input type="text" id="einsatz-verantwortlich" placeholder="Verantwortlicher"><br><br>
+                <select id="einsatz-kategorie">
+                    <option>Gartenarbeit</option>
+                    <option>Verkauf/Aktionen</option>
+                    <option>Feste</option>
+                    <option>Kindergarten-Pflege</option>
+                    <option>Sonstiges</option>
+                </select><br><br>
+                <input type="number" id="einsatz-punkte" placeholder="Punkte"><br><br>
+                <input type="number" id="einsatz-anzahl" placeholder="Helferanzahl"><br><br>
+                <button class="btn" onclick="neuenEinsatzErstellen()">Einsatz erstellen</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            if (tab === 'admin') {
+                document.getElementById('parent-view').style.display = 'none';
+                document.getElementById('admin-view').style.display = 'block';
+                document.querySelector('.tabs button:nth-child(2)').classList.add('active');
+            } else {
+                document.getElementById('parent-view').style.display = 'block';
+                document.getElementById('admin-view').style.display = 'none';
+                document.querySelector('.tabs button:nth-child(1)').classList.add('active');
+            }
+        }
+
+        function eintragen() {
+            const name = document.getElementById("helfer-name").value;
+            const id = document.getElementById("einsatz-id").value;
+            const index = parseInt(document.getElementById("platz-nr").value);
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "setHelfer",
+                    id: id,
+                    name: name,
+                    index: index
+                })
+            }).then(res => res.json()).then(d => {
+                if (d.success) alert("Eintrag gespeichert.");
+                else alert("Fehler: " + d.message);
+            });
+        }
+
+        function zeigeEigeneEinsaetze() {
+            const name = document.getElementById("suche-name").value;
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const eintraege = data.data.filter(row => row.includes(name));
+                    let html = "<h4>Deine Einsätze:</h4><ul>";
+                    eintraege.forEach(row => {
+                        html += `<li>${row[1]} – ${row[2]} – ${row[3]}</li>`;
+                    });
+                    html += "</ul>";
+                    document.getElementById("eigene-einsaetze").innerHTML = html;
+                });
+        }
+
+        function adminLogin() {
+            const pw = document.getElementById('admin-pw').value;
+            if (pw === "SiebenZwerge") {
+                document.getElementById('admin-panel').style.display = 'block';
+            } else {
+                alert("Falsches Passwort");
+            }
+        }
+
+        function neuenEinsatzErstellen() {
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "addEinsatz",
+                    adminPassword: "SiebenZwerge",
+                    name: document.getElementById("einsatz-titel").value,
+                    datum: document.getElementById("einsatz-datum").value,
+                    uhrzeit: document.getElementById("einsatz-uhrzeit").value,
+                    verantwortlich: document.getElementById("einsatz-verantwortlich").value,
+                    kategorie: document.getElementById("einsatz-kategorie").value,
+                    punkte: parseInt(document.getElementById("einsatz-punkte").value),
+                    helferanzahl: parseInt(document.getElementById("einsatz-anzahl").value)
+                })
+            }).then(res => res.json()).then(d => {
+                if (d.success) alert("Einsatz gespeichert.");
+                else alert("Fehler beim Speichern.");
+            });
+        }
+    </script>
+</body>
 </html>
